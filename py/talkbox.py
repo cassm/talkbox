@@ -5,48 +5,54 @@ import os
 import glob
 
 class Player(Task):
-    pathChanged = True 
-    lastAction = "stop"
+    SONG_END = pygame.USEREVENT + 1
     songs = [] 
+    trackNumber = 0
+    playlistPath = ""
 
+
+    def play_track(self):
+        if self.trackNumber < len(self.songs):
+            print "Playing track {} ({}).".format(self.trackNumber + 1, self.songs[self.trackNumber])
+            pygame.mixer.music.load(os.path.join(self.playlistPath, self.songs[self.trackNumber]))
+            pygame.mixer.music.play()
+            
     def pre_startup(self):
+        pygame.init()
         pygame.mixer.init()
+        pygame.mixer.music.set_endevent(self.SONG_END)
         
     @onsignal('settings_update', 'player')
-    def on_settings_update(self, name, settings):
-        # This signal is sent on startup and whenever settings are changed by the server
-        if self.pathChanged:
-            inputPath = settings.get_list('controls', 'path')[0]
-            self.songs = []
-            for songName in os.listdir(inputPath):
-                if ".mp3" in songName:
-                    self.songs.append(songName)
-
-            self.pathChanged = False
-            trackNumber = 0
-
+    def on_settings_update(self, name, settings):        
         action  = settings.get_list('controls', 'action')[0]
         
-        if action != self.lastAction:
-            self.lastAction = action
-
-            if action == 'play':
-                if pygame.mixer.music.get_busy():
-                    pygame.mixer.music.unpauseMusic()
-                else:
-                    pygame.mixer.music.load(os.path.join(inputPath, songs[trackNumber]))
-                    pygame.mixer.music.play()
+        if action == 'play':
+            if pygame.mixer.music.get_busy():
+                pygame.mixer.music.unpause()
+            else:
+                inputPath = settings.get_list('path', 'path')[0]
+                self.playlistPath = inputPath
+                self.songs = []
+                for songName in os.listdir(inputPath):
+                    if ".mp3" in songName:
+                        self.songs.append(songName)
+                self.songs.sort()
+                self.trackNumber = 0
+                self.play_track()
                 
-            elif action == 'pause':
-                pygame.mixer.music.pauseMusic()
+        elif action == 'pause':
+            pygame.mixer.music.pause()
 
-            elif action == 'stop':
-                pygame.mixer.music.stop()
+        elif action == 'stop':
+            pygame.mixer.music.stop()
 
     def poll(self):
         """Called on a schedule defined in dataplicity.conf"""
-        #value = math.sin(time() * self.frequency) * self.amplitude
-        #self.do_sample(value)
+        for event in pygame.event.get():
+            if event.type == self.SONG_END:
+                print "Track {} ({}) finished.".format(self.trackNumber + 1, self.songs[self.trackNumber])
+                self.trackNumber += 1
+                self.play_track
 
     def do_sample(self, value):
         """something"""

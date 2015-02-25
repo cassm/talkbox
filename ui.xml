@@ -9,16 +9,21 @@
 			    destination="device.settings.talkbox.parrot.phrase" type="list" />
 		</form>
 	    </tab>
-	    <tab title="Music Player">
+	    <tab title="Music player">
 		<form button="Player action" title="Player action">
 		  <select title="Action"
 			  destination="device.settings.player.controls.action" 
 		          source="device.settings.player.controls.action" 
-			  lue="stop">
+			  value="stop">
 		    <option value="play">Play</option> 
 		    <option value="pause">Pause</option> 
 		    <option value="stop">Stop</option>
 		  </select>		  
+		</form>
+		<form button="Album path" title="Album path">
+		  <textedit title="Path"
+			    source="device.settings.player.path.path"
+			    destination="device.settings.player.path.path" type="list" />
 		</form>
 	    </tab>
 	</mastertabcontainer>
