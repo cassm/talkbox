@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui>
     <interface id="dataplicity">
-        <mastertabcontainer title="${device.name}" id="dataplicity-tabs">
+        <mastertabcontainer title="Talkbox" id="dataplicity-tabs">
 	    <tab title="Talkbox">
 	        <form button="Speak!" title="Parrot parameters">
 		  <textedit title="Phrase"
 			    source="device.settings.talkbox.parrot.phrase"
 			    destination="device.settings.talkbox.parrot.phrase" type="list" />
-		  
+		</form>
+	    </tab>
+	    <tab title="Music Player">
+		<form button="Player action" title="Player action">
+		  <select title="Action"
+			  destination="device.settings.player.controls.action" 
+		          source="device.settings.player.controls.action" 
+			  lue="stop">
+		    <option value="play">Play</option> 
+		    <option value="pause">Pause</option> 
+		    <option value="stop">Stop</option>
+		  </select>		  
 		</form>
 	    </tab>
 	</mastertabcontainer>
