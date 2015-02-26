@@ -3,9 +3,10 @@ import urllib, urllib2, pycurl, subprocess
 import pygame
 import os
 import glob
+SONG_END = pygame.USEREVENT + 1
 
 class Player(Task):
-    SONG_END = pygame.USEREVENT + 1
+
     songs = [] 
     trackNumber = 0
     playlistPath = ""
@@ -20,8 +21,9 @@ class Player(Task):
     def pre_startup(self):
         pygame.init()
         pygame.mixer.init()
-        pygame.mixer.music.set_endevent(self.SONG_END)
-        
+        pygame.mixer.music.set_endevent(SONG_END)
+        endtype = pygame.mixer.music.get_endevent() 
+        print "endevent type == {}: {}".format(endtype, endtype == SONG_END)
     @onsignal('settings_update', 'player')
     def on_settings_update(self, name, settings):        
         action  = settings.get_list('controls', 'action')[0]
@@ -37,7 +39,7 @@ class Player(Task):
                     if ".mp3" in songName:
                         self.songs.append(songName)
                 self.songs.sort()
-                self.trackNumber = 0
+                self.trackNumber = 2
                 self.play_track()
                 
         elif action == 'pause':
@@ -49,10 +51,9 @@ class Player(Task):
     def poll(self):
         """Called on a schedule defined in dataplicity.conf"""
         for event in pygame.event.get():
-            if event.type == self.SONG_END:
-                print "Track {} ({}) finished.".format(self.trackNumber + 1, self.songs[self.trackNumber])
+            if event.type == SONG_END:
                 self.trackNumber += 1
-                self.play_track
+                self.play_track()
 
     def do_sample(self, value):
         """something"""
